@@ -1,6 +1,8 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+/*var redis = require('socket.io-redis');*/
+/*io.adapter(redis({ host: 'localhost', port: 5556 }));*/
 
 //it sends main page to users
 app.get('/', function(req, res) {
@@ -10,15 +12,27 @@ app.get('/', function(req, res) {
 //use it each time when smth was happend in client-side
 io.on('connection', function(socket) {
   //it gets and sends back messages from users
-  socket.on('newMessage', function(msg) {
-    console.log('message: ' + msg);
-    io.emit('message:', msg);
-  });
-  
-  //it writes about new commers
+
+
+//http://habrahabr.ru/post/127525/
+
+  //it writes about new user
   socket.on('newUser', function(newUser) {
+    var time = (new Date).toLocaleTimeString();
+    console.log(newUser + ' join to us.');
+    io.emit('message:', {'time': time, 'msg': newUser + ' join to us'});
+  });
+
+  //it writes about new user success
+  socket.on('newUserSuccess', function(newUser) {
     console.log(newUser + ' join to us.');
     io.emit('message:', newUser + ' join to us.');
+  });
+
+  socket.on('newMessage', function(msg) {
+    var time = (new Date).toLocaleTimeString();
+    console.log('message: ' + time + ' : ' + msg);
+    io.emit('message:', {'time': time, 'msg': msg});
   });
   
   //it writes 
@@ -27,8 +41,9 @@ io.on('connection', function(socket) {
   });
   
   //it writes about disconected people
-  socket.on('disconnect', function () {
-    io.sockets.emit('user disconnected');
+  socket.on('logoutUser', function (logoutUser) {
+    io.emit('message:', logoutUser + ' logout from chat.');
+    io.sockets.emit('logoutUser');
   });
 });
 

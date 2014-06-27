@@ -11,57 +11,102 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      .user-span, .msg-span {color: red; }
   </style>
   <script src="/socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
   var socket = io();
+  var $username = '';
+  var $loginTable = '';
+
+  //works with send messages
   jQuery(function ($) {
     $('.message-form').submit(function (event) {
       event.preventDefault();
       var $message = $('.msg');
-      socket.emit('newMessage', $message.val());
+      if ($message.val().trim() !== "") {
+        socket.emit('newMessage', $message.val());
+      } else {
+        $('.msg-span').text("Message is empty!").show().fadeOut(1000);
+      }
       $message.val('');
     });
   });
 
+  //works with login (header)
   jQuery(function ($) {
     $('.new-user-form').submit(function (event) {
       event.preventDefault();
       var $user = $('.username');
-      socket.emit('newUser', $user.val());
-      $message.val('');
+      $username = $user;
+      var $password = $('.password');
+      console.log('user: ' + $user.val() + '; password: ' + $password.val());
+      if ($user.val().trim() !== "") {
+        $('.user-span').text("Sucess!").show().fadeOut(1000);
+        socket.emit('newUser', $user.val());
+        $loginTable = $('header-form');
+        $('.new-user-form').empty();
+        $(".new-user-form").append("<p>Hello, " + $user.val() + "&nbsp;&nbsp;<input type='submit' class='btn-u' value='Log out'></td></p>");
+        $('.new-user-form').removeClass('new-user-form').addClass('logout-form');
+        $user.val('');
+        $password.val('');
+      } else {
+        $('.user-span').text("Username is empty!").show().fadeOut(1000);
+      }
     });
   });
-  socket.on('message:', function(msg){
-    $('#messages').append($('<li>').text(msg));
+
+  //works with logout (header)
+  jQuery(function ($) {
+    $('.logout-form').submit(function (event) {
+      alert();
+      event.preventDefault();
+      console.log('user: ' + $username + ' logout');
+      $('.user-span').text("logout!").show().fadeOut(1000);
+      socket.emit('logoutUser', $username);
+      $('.logout-form').empty();
+      $(".logout-form").append($loginTable);
+      $('.logout-form').removeClass('logout-form').addClass('new-user-form');
+    });
+  });
+
+  // add new messages to window
+  socket.on('message:', function(msg1) {
+    $('#messages').append($('<li>').text(msg1.time + ' : ' + msg1.msg));
   });
 </script>
 </head>
 <body>
-  
-  <form action="" class="new-user-form">
-    <table>
-      <tr>
-        <td>username:</td>
-        <td><input type="text" class="username" value="" size="10"></td>
-        <td>password:</td>
-        <td><input type="text" class="password" value="" size="10"></td>
-        <td><input type="submit" class="btn-j" value="Log in"></td>
-      </tr>
-    </table>
-    <hr>
-  </form>
+  <header>
+    <div class="header-form">
+    <form action="" class="new-user-form">
+      <table>
+        <tr>
+          <td>username:</td>
+          <td>
+            <input type="text" class="username" value="" size="10"></td>
+          <td>password:</td>
+          <td>
+            <input type="text" class="password" value="" size="10"></td>
+          <td>
+            <input type="submit" class="btn-u" value="Log in"></td>
+        </tr>
+      </table>
+      </form>
+      </div>
+      <span class="user-span"></span>
+      <hr>
+  </header>
 
 
-  <ul id="messages"></ul>
-  <form action="" class="message-form">
-    <input type="text" class="msg" value="">
-    <input type="submit" class="btn" value="Send">
-  </form>
-  
- 
+<ul id="messages"></ul>
+<span class="msg-span"></span>
+<form action="" class="message-form">
+  <input type="text" class="msg" value="">
+  <input type="submit" class="btn" value="Send"></form>
 
+<footer></footer>
 
 </body>
 </html>
