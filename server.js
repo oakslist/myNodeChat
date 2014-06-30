@@ -1,12 +1,21 @@
+var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-/*var redis = require('socket.io-redis');*/
-/*io.adapter(redis({ host: 'localhost', port: 5556 }));*/
+
+// Set .html as the default template extension
+app.set('view engine', 'html');
+
+
+// Tell express where it can find the templates
+app.set('views', __dirname + '/views');
+
+// Make the files in the public folder available to the world
+app.use(express.static(__dirname + '/public'));
 
 //it sends main page to users
 app.get('/', function(req, res) {
-  res.sendfile('index.html');
+  res.sendfile('./views/index.html');
 });
 
 //use it each time when smth was happend in client-side
@@ -16,8 +25,8 @@ io.on('connection', function(socket) {
 
 //http://habrahabr.ru/post/127525/
 
-  //it writes about new user
-  socket.on('newUser', function(newUser) {
+//it writes about new user
+socket.on('newUser', function(newUser) {
     var time = (new Date).toLocaleTimeString();
     console.log(newUser + ' join to us.');
     io.emit('message:', {'time': time, 'msg': newUser + ' join to us'});
@@ -48,6 +57,7 @@ io.on('connection', function(socket) {
 });
 
 //our port which server is listening
-http.listen(5555, function() {
-  console.log('listening on *:5555');
+var port = 5555;
+http.listen(port, function() {
+  console.log('Server is running on http://localhost:' + port);
 });

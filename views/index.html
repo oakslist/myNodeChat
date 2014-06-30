@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <title>FrontEnd Chat</title>
+  <link type="text/css" rel="stylesheet" href="../css/style.css" />
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+</head>
+<body>
+  <main>
+    <header class="main-header">
+      <div class="header-section">
+        <form action="" class="new-user-form">
+          <table>
+            <tr>
+              <td>username:</td>
+              <td>
+                <input type="text" class="username" value="" size="10"></td>
+              <td>password:</td>
+              <td>
+                <input type="text" class="password" value="" size="10"></td>
+              <td>
+                <button class="btn-login">Log in</button></td>
+              <td>
+                <button class="btn-registrate">Registrate</button></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+      <span class="user-span"></span>
+      <hr></header>
+
+    <div class="users-sheet">
+
+      <header class="aside-header"></header>
+      <div></div>
+
+      <footer></footer>
+    </div>
+
+    <div class="chat-sheet">
+
+      <header class="aside-header"></header>
+      <div class="messages">
+        <ul id="messages"></ul>
+
+      </div>
+
+      <footer></footer>
+
+    </div>
+
+    <footer>
+      <span class="msg-span"></span>
+      <form action="" class="message-form">
+        <input type="text" class="msg" value="">
+        <input type="submit" class="btn-send" value="Send"></form>
+    </footer>
+  </main>
+  
+  <script src="../js/chat.js"></script>
+</body>
+</html>
